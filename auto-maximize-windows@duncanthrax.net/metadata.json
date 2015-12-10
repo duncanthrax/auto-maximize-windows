@@ -1,0 +1,8 @@
+{
+ "shell-version": ["3.16", "3.18"],
+ "uuid": "auto-maximize-windows@duncanthrax.net",
+ "name": "Auto Maximize Windows",
+ "url": "https://github.com/duncanthrax/auto-maximize-windows",
+ "description": "Automatically tile and maximize newly created application windows",
+ "settings-schema": "org.gnome.shell.extensions.auto-maximize-windows"
+}
