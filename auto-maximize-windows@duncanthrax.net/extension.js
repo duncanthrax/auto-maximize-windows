@@ -5,19 +5,23 @@ const Meta = imports.gi.Meta;
 let config = [
     {
         match: 'firefox.desktop',
-        action: 'alternate'
+        action: 'alternate',
+        remove_titlebar: true
     },
     {
         match: 'gnome-terminal.desktop',
-        action: 'alternate'
+        action: 'alternate',
+        remove_titlebar: true
     },
     {
         match: 'deadbeef.desktop',
-        action: 'right'
+        action: 'right',
+        remove_titlebar: true
     },
     {
         match: 'sublime_text.desktop',
-        action: 'maximize'
+        action: 'maximize',
+        remove_titlebar: true
     },
     {
         match: 'org.gnome.nautilus.desktop',
@@ -47,53 +51,64 @@ const WindowMaximizer = new Lang.Class({
         if (window.skip_taskbar)
             return;
 
+        let app_id = false;
+
         let app = this._windowTracker.get_window_app(window);
-        if (!app) {
+        if (app) {
+            app_id = app.get_id().toLowerCase();
+        }
+        else {
             if (!noRecurse) {
                 // window is not tracked yet
                 Mainloop.idle_add(Lang.bind(this, function() {
-                    this._findAndMove(display, window, true);
+                    this._findAndProcess(display, window, true);
                     return false;
                 }));
-            } else
-                log('Cannot find application for window');
-            return;
+                return;
+            }
         }
-        let app_id = app.get_id().toLowerCase();
 
-        let foundMatch = false;
+        let found = false;
 
         config.forEach(function(entry) {
             if (app_id.match(entry.match)) {
-                foundMatch = true;
-                log(entry.action + ":" + app_id);
-                switch (entry.action) {
-                    case 'left':
-                        window.tile(Meta.TileMode.LEFT);
-                        break;
-                    case 'right':
-                        window.tile(Meta.TileMode.RIGHT);
-                        break;
-                    case 'maximize':
-                        window.maximize(Meta.MaximizeFlags.BOTH);
-                        break;
-                    case 'alternate':
-                        if (entry.lastRight) {
-                            window.tile(Meta.TileMode.LEFT);
-                            entry.lastRight = false;
-                        }
-                        else {
-                            window.tile(Meta.TileMode.RIGHT);
-                            entry.lastRight = true;
-                        }
-                    break;
-                }
+                foundMatch = entry;
+            }
             }
         });
 
         if (!foundMatch) {
             log("Unmatched:" + app_id);
         }
+
+
+
+        if (found.remove_titlebar)
+            window.set_hide_titlebar_when_maximized(true);
+        
+        switch (found.action) {
+            case 'left':
+                window.tile(Meta.TileMode.LEFT);
+                break;
+            case 'right':
+                window.tile(Meta.TileMode.RIGHT);
+                break;
+            case 'maximize':
+                window.maximize(Meta.MaximizeFlags.BOTH);
+                break;
+            case 'alternate':
+                if (found.lastRight) {
+                    window.tile(Meta.TileMode.LEFT);
+                    found.lastRight = false;
+                }
+                else {
+                    window.tile(Meta.TileMode.RIGHT);
+                    found.lastRight = true;
+                }
+            break;
+        }
+
+
     }
 });
 
