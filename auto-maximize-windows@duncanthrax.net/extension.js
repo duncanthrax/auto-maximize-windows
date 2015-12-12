@@ -14,7 +14,8 @@ let config = [
         remove_titlebar: true
     },
     {
-        match: 'deadbeef.desktop',
+        match: 'deadbeef',
+        match_title: true,
         action: 'right',
         remove_titlebar: true
     },
@@ -51,37 +52,33 @@ const WindowMaximizer = new Lang.Class({
         if (window.skip_taskbar)
             return;
 
-        let app_id = false;
-
         let app = this._windowTracker.get_window_app(window);
-        if (app) {
-            app_id = app.get_id().toLowerCase();
-        }
-        else {
+        if (!app) {
             if (!noRecurse) {
                 // window is not tracked yet
                 Mainloop.idle_add(Lang.bind(this, function() {
                     this._findAndProcess(display, window, true);
                     return false;
                 }));
-                return;
             }
+            return;
         }
 
+        let app_id = app.get_id() ? app.get_id().toLowerCase() : '';
+        let title  = window.title ? window.title.toLowerCase() : '';
+        
         let found = false;
-
         config.forEach(function(entry) {
-            if (app_id.match(entry.match)) {
-                foundMatch = entry;
+            if ( (entry.match_title && title.match(entry.match)) || app_id.match(entry.match) ) {
+                found = entry;
+                return false;
             }
-            }
+            return true;
         });
-
-        if (!foundMatch) {
-            log("Unmatched:" + app_id);
+        if (!found) {
+            log("Unmatched app_id(" + app_id + ")" + " title(" + title + ")");
+            return;
         }
-
-
 
         if (found.remove_titlebar)
             window.set_hide_titlebar_when_maximized(true);
@@ -107,8 +104,6 @@ const WindowMaximizer = new Lang.Class({
                 }
             break;
         }
-
-
     }
 });
 
