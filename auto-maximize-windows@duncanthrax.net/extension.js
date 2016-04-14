@@ -25,6 +25,12 @@ let config = [
         remove_titlebar: true
     },
     {
+        match: 'HipChat',
+        match_title: true,
+        action: 'right',
+        remove_titlebar: true
+    },
+    {
         match: 'org.gnome.nautilus.desktop',
         action: 'alternate'
     }
