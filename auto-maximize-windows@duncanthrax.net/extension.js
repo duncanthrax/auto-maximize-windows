@@ -9,7 +9,22 @@ let config = [
         remove_titlebar: true
     },
     {
-        match: 'gnome-terminal.desktop',
+        match: 'chromium-browser.desktop',
+        action: 'alternate',
+        remove_titlebar: true
+    },
+    {
+        match: 'skypeforlinux.desktop',
+        action: 'right',
+        remove_titlebar: true
+    },
+    {
+        match: 'spotify.desktop',
+        action: 'left',
+        remove_titlebar: true
+    },
+    {
+        match: 'org.gnome.terminal.desktop',
         action: 'alternate',
         remove_titlebar: true
     },
@@ -25,8 +40,8 @@ let config = [
         remove_titlebar: true
     },
     {
-        match: 'HipChat',
-        match_title: true,
+        match: 'hipchat4.desktop',
+        //match_title: true,
         action: 'right',
         remove_titlebar: true
     },
